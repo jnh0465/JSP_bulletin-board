@@ -22,7 +22,7 @@ public class JoinOk extends HttpServlet {
 	private static final long serialVersionUID = 1L;
    
 	private Connection connection;
-	private Statement stmt;
+	PreparedStatement ps;
 	
 	private String name, id, pw, age, gender;
 
@@ -51,14 +51,21 @@ public class JoinOk extends HttpServlet {
 		age = request.getParameter("age");
 		gender = request.getParameter("gender");
 		
-		String query = "insert into member values('" + name + "', '" + id + "', '" + pw + "', '" + age + "', '" + gender + "')";
+		String query = "insert into member (id, name, pw, age, gender) values (?, ?, ?, ?, ?)";
 		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl" , "scott" , "tiger");
-			stmt = connection.createStatement();
-			int i = stmt.executeUpdate(query);
-			if(i == 1){
+			int n;
+			ps = connection.prepareStatement(query);
+			ps.setString(1, id);
+			ps.setString(2, name);
+			ps.setString(3, pw);
+			ps.setString(4, age);
+			ps.setString(5, gender);
+
+			n = ps.executeUpdate();
+			if(n == 1){
 				System.out.println("insert success");
 				response.sendRedirect("joinResult.jsp");
 			} else {
@@ -69,7 +76,8 @@ public class JoinOk extends HttpServlet {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt != null) stmt.close();
+				if(ps != null) ps
+				.close();
 				if(connection != null) connection.close();
 			} catch (Exception e) {}
 		}
