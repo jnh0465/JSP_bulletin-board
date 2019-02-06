@@ -1,65 +1,31 @@
-<%@page import="java.sql.DriverManager"%>
-<%@page import="java.sql.ResultSet"%>
-<%@page import="java.sql.Statement"%>
-<%@page import="java.sql.Connection"%>
+<%@page import="com.ljw.bulletinboard.MemberDto"%>
+<%@page import="com.ljw.bulletinboard.MemberDao"%>
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR"%>
-    
-    <%!
-    	Connection connection;
-    	Statement statement;
-    	ResultSet resultSet;
-    
-    	String name, id, pw, age, gender;
-    %>
-    
+<% request.setCharacterEncoding("EUC-KR"); %>
+<%
+	String id = (String)session.getAttribute("id");
+	MemberDao dao = MemberDao.getInstance();
+	MemberDto dto = dao.getMember(id);
+%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>Insert title here</title>
+<script language="JavaScript" src="members.js" ></script>
 </head>
 <body>
-	
-	<%
-		id = (String)session.getAttribute("id");
-	
-		String query = "select * from member where id = '" + id + "'";
-		
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-		connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl" , "scott" , "tiger");
-		statement = connection.createStatement();
-		resultSet =  statement.executeQuery(query);
-		
-		while(resultSet.next()) {
-			name = resultSet.getString("name");
-			id = resultSet.getString("id");
-			pw = resultSet.getString("pw");
-			age = resultSet.getString("age");
-			gender = resultSet.getString("gender");
-		}
-		
-	%>
-	
-	<form action="ModifyOk" method="post">
-		이름 : <input type="text" name="name" size="10" value=<%=name %>><br />
-		아이디 : <%=id %><input type="hidden" name="id" value=<%= id%> size="10"><br />
-	
-		비밀번호 : <input type="text" name="pw" size="10"><br />
-		나이 : <input type="text" name="age" size="10"><br />
-		<%
-			if(gender.equals("man")) {
-		%>
-		성별구분 : <input type="radio" name="gender" value="man" checked="checked">남 &nbsp;<input type="radio" name="gender" value="woman">여 <br />
-		<%
-			} else {
-		%>
-		성별구분 : <input type="radio" name="gender" value="man" >남 &nbsp;<input type="radio" name="gender" value="woman" checked="checked">여 <br />
-		<%
-			}
-		%>
-		<input type="submit" value="정보수정"> <input type="reset" value="취소">
-	</form>
+	<form action="modifyOk.jsp" method="post" name="reg_frm">
+		아이디 : <%= dto.getId() %><br />
+		비밀번호 : <input type="password" name="pw" size="20"><br />
+		비밀번호 확인 : <input type="password" name="pw_check" size="20"><br />
+		이름 : <%= dto.getName() %><br />
+		나이 : <input type="text" name="age" size="20" value="<%= dto.getAge() %>"><br />
+		성별 : <input type="radio" name="gender" value="man">남 &nbsp;<input type="radio" name="gender" value="woman">여 <br />
 
+		<input type="button" value="수정" onclick="updateInfoConfirm()">&nbsp;&nbsp;&nbsp; <input type="reset" value="취소" onclick="javascript:window.location='login.jsp'">
+	</form>
 </body>
 </html>

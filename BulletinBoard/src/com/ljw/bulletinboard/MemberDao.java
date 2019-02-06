@@ -132,6 +132,72 @@ public class MemberDao {
 		return ri;
 	}
 	
+	public MemberDto getMember(String id) {
+		Connection connection = null;
+		PreparedStatement pstmt = null;
+		ResultSet set = null;
+		String query = "select * from members2 where id = ?";
+		MemberDto dto = null;
+		
+		try {
+			connection = getConnection();
+			pstmt = connection.prepareStatement(query);
+			pstmt.setString(1, id);
+			set = pstmt.executeQuery();
+			
+			if(set.next()) {
+				dto = new MemberDto();
+				dto.setName(set.getString("name"));
+				dto.setId(set.getString("id"));
+				dto.setPw(set.getString("pw"));
+				dto.setAge(set.getString("age"));
+				dto.setrDate(set.getTimestamp("rDate"));
+				dto.setGender(set.getString("gender"));
+				
+//				System.out.println("id : "+set.getString("id"));
+//				System.out.println("name : "+set.getString("name"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				set.close();
+				pstmt.close();
+				connection.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		return dto;
+	}
+	
+	public int updateMember(MemberDto dto) {
+		int ri = 0;
+		
+		Connection connection = null;
+		PreparedStatement pstmt = null;
+		String query = "update members2 set pw=?, age=?, gender=? where id=?";
+		
+		try {
+			connection = getConnection();
+			pstmt = connection.prepareStatement(query);
+			pstmt.setString(1, dto.getPw());
+			pstmt.setString(2, dto.getAge());
+			pstmt.setString(3, dto.getGender());
+			pstmt.setString(4, dto.getId());
+			ri = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				pstmt.close();
+				connection.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		return ri;
+	}
 	
 	private Connection getConnection() {
 		

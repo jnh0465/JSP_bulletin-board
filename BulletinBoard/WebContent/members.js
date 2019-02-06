@@ -41,3 +41,19 @@ function infoConfirm() {
 	
 	document.reg_frm.submit();
 }
+
+function updateInfoConfirm() {
+	if(document.reg_frm.pw.value == "") {
+		alert("�н����带 �Է��ϼ���.");
+		document.reg_frm.pw.focus();
+		return;
+	}
+	
+	if(document.reg_frm.pw.value != document.reg_frm.pw_check.value) {
+		alert("�н����尡 ��ġ���� �ʽ��ϴ�.");
+		reg_frm.pw.focus();
+		return;
+	}
+	
+	document.reg_frm.submit();
+}
